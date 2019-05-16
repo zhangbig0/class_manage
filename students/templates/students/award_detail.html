@@ -1,0 +1,9 @@
+<h1>{{ award.name }}的详情</h1>
+
+<h3>日期:{{ award.time }}</h3>
+
+<ul>
+    {% for student in award.student_set.all %}
+        <li>{{ student.name }}</li>
+    {% endfor %}
+</ul>

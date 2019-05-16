@@ -1,0 +1,10 @@
+<h1>Award</h1>
+
+<ul>
+    {% for award in object_list %}
+        <li><a href="{% url 'student:award-detail' award.id %}">{{ award.name }}</a></li>
+    {% empty %}
+        <li>No Awards yet.</li>
+    {% endfor %}
+
+</ul>

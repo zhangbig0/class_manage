@@ -1,0 +1,7 @@
+<h1>{{ student.name }}的学生详情</h1>
+
+<ul>
+    {% for award in student.award_set.all %}
+        <li>{{ award.name }}</li>
+    {% endfor %}
+</ul>
