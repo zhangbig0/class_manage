@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import StudentListView,AwardListView
+from .views import StudentListView, AwardListView
 from . import views
 
 app_name = 'student'

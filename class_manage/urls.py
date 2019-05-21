@@ -18,5 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('students/', include('students.urls'))
+    path('students/', include('students.urls')),
+    path('userprofile/', include('userprofile.urls', namespace='userprofile')),
+    path('password-rest/',include('password_reset.urls')),
 ]

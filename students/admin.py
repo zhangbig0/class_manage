@@ -9,27 +9,27 @@ class StudentInline(admin.TabularInline):
 
 class StudentAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['name', 'study_id']}),
-        ('Detail', {'fields': ['year_in_school'], 'classes': ['collapse']})
+        ('学生信息', {'fields': ['student_name', 'study_id']}),
+        ('学生详情', {'fields': ['student_qq', 'student_email', 'student_tel', 'year_in_school'], 'classes': ['collapse']})
     ]
     inlines = [StudentInline]
-    list_display = ('name', 'study_id', 'year_in_school')
+    list_display = ('student_name', 'study_id', 'year_in_school')
     search_fields = ['student_name']
 
 
 class AwardInline(admin.TabularInline):
     model = Awardship
-    extra = 2
+    extra = 1
 
 
 class AwardAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['name', 'time']}),
-        ('Detail', {'fields': ['text']})
+        ('活动或荣誉名称', {'fields': ['award_name', 'get_time']}),
     ]
     inlines = [AwardInline]
-    list_display = ('name', 'time')
+    list_display = ('award_name', 'get_time')
 
 
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Award, AwardAdmin)
+admin.site.register(Awardship)
