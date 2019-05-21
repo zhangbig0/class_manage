@@ -1,0 +1,41 @@
+<!-- 定义导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+
+        <!-- 导航栏商标 -->
+        <a class="navbar-brand" href="{% url 'student:index' %}">班级管理网站</a>
+
+        <!-- 导航入口 -->
+        <div>
+            <ul class="navbar-nav">
+                <!-- 条目 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'student:student-list' %}">学生管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'student:award-list' %}">荣誉管理</a>
+                </li>
+
+                {% if user.is_authenticated %}
+                    <!-- 如果用户已经登录，则显示用户名下拉框 -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ user.username }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'userprofile:user-logout' %}">退出登录</a>
+                            <a class="dropdown-item" href="{% url 'userprofile:user-delete' user.id %}">删除用户</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'userprofile:user-login' %}">登录</a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </div>
+
+    </div>
+</nav>

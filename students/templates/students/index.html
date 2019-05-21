@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    首页
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <br>
+        <div class="jumbotron">
+            <h1>欢迎来到班级管理网站</h1>
+            <p>在这里管理温州大学18计本1班。</p>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h2><a href="{% url 'student:student-list' %}">学生列表</a></h2>
+                <p>{% lorem %}</p>
+            </div>
+            <div class="col-md-6">
+                <h2>联系我们</h2>
+                <p>{% lorem %}</p>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
