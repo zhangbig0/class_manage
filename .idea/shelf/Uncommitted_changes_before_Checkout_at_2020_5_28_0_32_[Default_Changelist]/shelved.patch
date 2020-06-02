@@ -1,0 +1,715 @@
+Index: templates/header.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!-- 定义导航栏 -->\r\n<nav class=\"navbar navbar-expand-lg navbar-dark bg-dark\">\r\n    <div class=\"container\">\r\n\r\n        <!-- 导航栏商标 -->\r\n        <a class=\"navbar-brand\" href=\"{% url 'student:index' %}\">班级管理网站</a>\r\n\r\n        <!-- 导航入口 -->\r\n        <div>\r\n            <ul class=\"navbar-nav\">\r\n                <!-- 条目 -->\r\n                <li class=\"nav-item\">\r\n                    <a class=\"nav-link\" href=\"{% url 'student:student-list' %}\">学生管理</a>\r\n                </li>\r\n                <li class=\"nav-item\">\r\n                    <a class=\"nav-link\" href=\"{% url 'student:award-list' %}\">荣誉管理</a>\r\n                </li>\r\n\r\n                {% if user.is_authenticated %}\r\n                    <!-- 如果用户已经登录，则显示用户名下拉框 -->\r\n                    <li class=\"nav-item dropdown\">\r\n                        <a class=\"nav-link dropdown-toggle\" href=\"#\" id=\"navbarDropdown\" role=\"button\"\r\n                           data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\r\n                            {{ user.username }}\r\n                        </a>\r\n                        <div class=\"dropdown-menu\" aria-labelledby=\"navbarDropdown\">\r\n                            <a class=\"dropdown-item\" href=\"{% url 'userprofile:user-logout' %}\">退出登录</a>\r\n                            <a class=\"dropdown-item\" href=\"{% url 'userprofile:user-delete' user.id %}\">删除用户</a>\r\n                        </div>\r\n                    </li>\r\n                {% else %}\r\n                    <li class=\"nav-item\">\r\n                        <a class=\"nav-link\" href=\"{% url 'userprofile:user-login' %}\">登录</a>\r\n                    </li>\r\n                {% endif %}\r\n\r\n            </ul>\r\n        </div>\r\n\r\n    </div>\r\n</nav>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/header.html	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ templates/header.html	(date 1574701904219)
+@@ -24,6 +24,7 @@
+                             {{ user.username }}
+                         </a>
+                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
++                            <a class="dropdown-item" href='{% url "userprofile:student-profile-edit" user.id %}'>个人信息</a>
+                             <a class="dropdown-item" href="{% url 'userprofile:user-logout' %}">退出登录</a>
+                             <a class="dropdown-item" href="{% url 'userprofile:user-delete' user.id %}">删除用户</a>
+                         </div>
+Index: students/templates/students/award_list.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"base.html\" %}\r\n{% load staticfiles %}\r\n\r\n{% block title %}\r\n    荣誉列表\r\n{% endblock %}\r\n\r\n{% block content %}\r\n    <div class=\"container\">\r\n        <div class=\"jumbotron\">\r\n            <h1>荣誉列表</h1>\r\n        </div>\r\n        <div class=\"table-responsive\">\r\n            <table class=\"table table-striped table-bordered\">\r\n                <thead>\r\n                <tr>\r\n                    <th>荣誉</th>\r\n                    <th>日期</th>\r\n                    <th>学生</th>\r\n                    <th>详情</th>\r\n                </tr>\r\n                </thead>\r\n                <tbody>\r\n                {% for award in object_list %}\r\n                    <tr>\r\n                        <td>{{ award.award_name }}</td>\r\n                        <td>{{ award.get_time }}</td>\r\n                        <td>\r\n                            <div class=\"container\">\r\n                                <ul>\r\n                                    {% for student in award.student.all %}\r\n                                        <li>\r\n                                            <p>\r\n                                                <a href=\"{% url 'student:student-detail' student.id %}\">{{ student.student_name }}</a>\r\n                                            </p>\r\n                                        </li>\r\n                                    {% endfor %}\r\n                                </ul>\r\n                            </div>\r\n                        </td>\r\n                        <td>\r\n                            <a href=\"{% url 'student:award-detail' award.id %}\">更多···</a>\r\n                        </td>\r\n                    </tr>\r\n                {% empty %}\r\n                    <tr>\r\n                        <td>没有荣誉</td>\r\n                    </tr>\r\n                {% endfor %}\r\n                </tbody>\r\n            </table>\r\n        </div>\r\n    </div>\r\n{% endblock content %}
+===================================================================
+--- students/templates/students/award_list.html	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ templates/students/award_list.html	(date 1574614939217)
+@@ -31,7 +31,7 @@
+                                     {% for student in award.student.all %}
+                                         <li>
+                                             <p>
+-                                                <a href="{% url 'student:student-detail' student.id %}">{{ student.student_name }}</a>
++                                                <a href="{% url 'student:student-detail' student.pk %}">{{ student.student_name }}</a>
+                                             </p>
+                                         </li>
+                                     {% endfor %}
+@@ -39,7 +39,7 @@
+                             </div>
+                         </td>
+                         <td>
+-                            <a href="{% url 'student:award-detail' award.id %}">更多···</a>
++                            <a href="{% url 'student:award-detail' award.pk %}">更多···</a>
+                         </td>
+                     </tr>
+                 {% empty %}
+Index: class_manage/settings.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\"\"\"\r\nDjango settings for class_manage project.\r\n\r\nGenerated by 'django-admin startproject' using Django 2.2.1.\r\n\r\nFor more information on this file, see\r\nhttps://docs.djangoproject.com/en/2.2/topics/settings/\r\n\r\nFor the full list of settings and their values, see\r\nhttps://docs.djangoproject.com/en/2.2/ref/settings/\r\n\"\"\"\r\n\r\nimport os\r\n\r\n# Build paths inside the project like this: os.path.join(BASE_DIR, ...)\r\nBASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))\r\n\r\n# Quick-start development settings - unsuitable for production\r\n# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/\r\n\r\n# SECURITY WARNING: keep the secret key used in production secret!\r\nSECRET_KEY = 'q^4b3c-#rjs5!%6#fd1u%9)s4hh6t=%u+y68q3677_cmvfn0m$'\r\n\r\n# SECURITY WARNING: don't run with debug turned on in production!\r\nDEBUG = True\r\n\r\nALLOWED_HOSTS = []\r\n\r\n# Application definition\r\n\r\nINSTALLED_APPS = [\r\n    'django.contrib.admin',\r\n    'django.contrib.auth',\r\n    'django.contrib.contenttypes',\r\n    'django.contrib.sessions',\r\n    'django.contrib.messages',\r\n    'django.contrib.staticfiles',\r\n    'students.apps.StudentsConfig',\r\n    'userprofile.apps.UserprofileConfig',\r\n    'password_reset',\r\n]\r\n\r\nMIDDLEWARE = [\r\n    'django.middleware.security.SecurityMiddleware',\r\n    'django.contrib.sessions.middleware.SessionMiddleware',\r\n    'django.middleware.common.CommonMiddleware',\r\n    'django.middleware.csrf.CsrfViewMiddleware',\r\n    'django.contrib.auth.middleware.AuthenticationMiddleware',\r\n    'django.contrib.messages.middleware.MessageMiddleware',\r\n    'django.middleware.clickjacking.XFrameOptionsMiddleware',\r\n]\r\n\r\nROOT_URLCONF = 'class_manage.urls'\r\n\r\nTEMPLATES = [\r\n    {\r\n        'BACKEND': 'django.template.backends.django.DjangoTemplates',\r\n        'DIRS': [os.path.join(BASE_DIR, 'templates')]\r\n        ,\r\n        'APP_DIRS': True,\r\n        'OPTIONS': {\r\n            'context_processors': [\r\n                'django.template.context_processors.debug',\r\n                'django.template.context_processors.request',\r\n                'django.contrib.auth.context_processors.auth',\r\n                'django.contrib.messages.context_processors.messages',\r\n            ],\r\n        },\r\n    },\r\n]\r\n\r\nWSGI_APPLICATION = 'class_manage.wsgi.application'\r\n\r\n# Database\r\n# https://docs.djangoproject.com/en/2.2/ref/settings/#databases\r\n\r\nDATABASES = {\r\n    'default': {\r\n        'ENGINE': 'django.db.backends.sqlite3',\r\n        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),\r\n    }\r\n}\r\n\r\n# Password validation\r\n# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators\r\n\r\nAUTH_PASSWORD_VALIDATORS = [\r\n    {\r\n        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',\r\n    },\r\n    {\r\n        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',\r\n    },\r\n    {\r\n        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',\r\n    },\r\n    {\r\n        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',\r\n    },\r\n]\r\n\r\n# Internationalization\r\n# https://docs.djangoproject.com/en/2.2/topics/i18n/\r\n\r\nLANGUAGE_CODE = 'en-us'\r\n\r\nTIME_ZONE = 'UTC'\r\n\r\nUSE_I18N = True\r\n\r\nUSE_L10N = True\r\n\r\nUSE_TZ = True\r\n\r\n# Static files (CSS, JavaScript, Images)\r\n# https://docs.djangoproject.com/en/2.2/howto/static-files/\r\nSTATICFILES_DIRS = (\r\n\r\n    os.path.join(BASE_DIR, \"static\"),\r\n)\r\n\r\nSTATIC_URL = '/static/'\r\n\r\nEMAIL_HOST = 'smtp.qq.com'\r\nEMAIL_HOST_USER = '798647292@qq.com'\r\nEMAIL_HOST_PASSWORD = 'ruerhfwrawvkbbfh'\r\nEMAIL_PORT = 25\r\nEMAIL_USE_TLS = True\r\nDEFAULT_FROM_EMAIL = '班级管理网站<798647292@qq.com>'\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- class_manage/settings.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ class_manage/settings.py	(date 1590596518558)
+@@ -37,7 +37,8 @@
+     'django.contrib.staticfiles',
+     'students.apps.StudentsConfig',
+     'userprofile.apps.UserprofileConfig',
+-    'password_reset',
++    'password_reset'
++    'admin',
+ ]
+ 
+ MIDDLEWARE = [
+Index: students/migrations/0015_student_user.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- students/migrations/0015_student_user.py	(date 1574689919246)
++++ students/migrations/0015_student_user.py	(date 1574689919246)
+@@ -0,0 +1,21 @@
++# Generated by Django 2.2.1 on 2019-11-25 13:51
++
++from django.conf import settings
++from django.db import migrations, models
++import django.db.models.deletion
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++        ('students', '0014_auto_20191123_1351'),
++    ]
++
++    operations = [
++        migrations.AddField(
++            model_name='student',
++            name='user',
++            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='账号', to=settings.AUTH_USER_MODEL),
++        ),
++    ]
+Index: students/templates/students/award_detail.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"base.html\" %}\r\n{% load staticfiles %}\r\n\r\n{% block title %}\r\n    荣誉详情\r\n{% endblock %}\r\n\r\n{% block content %}\r\n    <div class=\"container\">\r\n        <div class=\"row\">\r\n            <div class=\"col-4\">\r\n                <div class=\"container\">\r\n                    <div class=\"jumbotron\">\r\n                        <h1>{{ award.award_name }}</h1>\r\n                        <p>{{ award.get_time }}</p>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-8\">\r\n                <div class=\"table-responsive\">\r\n                    <table class=\"table table-striped table-bordered\">\r\n                        <thead>\r\n                        <tr>\r\n                            <th>获奖同学</th>\r\n                            <th>获奖详情</th>\r\n                        </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                        {% for student in award.student.all %}\r\n                            <tr>\r\n                                <td>\r\n                                    <a href=\"{% url 'student:student-detail' student.id %}\">{{ student.student_name }}</a>\r\n                                </td>\r\n                                <td>\r\n                                    {% for a in student.awardship_set.all %}\r\n                                        {% if a.award == award %}\r\n                                            <p>{{ a.awardship_name }}</p>\r\n                                        {% endif %}\r\n                                    {% endfor %}\r\n                                </td>\r\n                            </tr>\r\n                        {% endfor %}\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n{% endblock content %}\r\n
+===================================================================
+--- students/templates/students/award_detail.html	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ templates/students/award_detail.html	(date 1574615001668)
+@@ -29,7 +29,7 @@
+                         {% for student in award.student.all %}
+                             <tr>
+                                 <td>
+-                                    <a href="{% url 'student:student-detail' student.id %}">{{ student.student_name }}</a>
++                                    <a href="{% url 'student:student-detail' student.pk %}">{{ student.student_name }}</a>
+                                 </td>
+                                 <td>
+                                     {% for a in student.awardship_set.all %}
+Index: students/templates/students/student_list.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"base.html\" %}\r\n{% load staticfiles %}\r\n\r\n{% block title %}\r\n    学生列表\r\n{% endblock %}\r\n\r\n{% block content %}\r\n    <br>\r\n    <div class=\"container\">\r\n        <div class=\"col\">\r\n            <div class=\"jumbotron\">\r\n                <h1>Students</h1>\r\n                <p>在这里管理温州大学18计本1班。</p>\r\n            </div>\r\n            <div class=\"table-responsive\">\r\n                <table class=\"table table-striped table-bordered\">\r\n                    <thead>\r\n                    <tr>\r\n                        <th>学号</th>\r\n                        <th>姓名</th>\r\n                        <th>荣誉</th>\r\n                        <th>详情</th>\r\n                    </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                    {% for student in object_list %}\r\n                        <tr>\r\n                            <td>{{ student.study_id }}</td>\r\n                            <td>{{ student.student_name }}</td>\r\n                            <td>\r\n                                <div class=\"container\">\r\n                                    <ul>\r\n                                        {% for award in student.award_set.all %}\r\n                                            <li>\r\n                                                <p>\r\n                                                    <a href=\"{% url 'student:award-detail' award.id %}\">{{ award.award_name }}</a>\r\n                                                </p>\r\n                                            </li>\r\n                                        {% endfor %}\r\n                                    </ul>\r\n                                </div>\r\n                            </td>\r\n                            <td>\r\n                                <a href=\"{% url 'student:student-detail' student.id %}\">更多···</a>\r\n                            </td>\r\n                        </tr>\r\n                    {% empty %}\r\n                        <tr>\r\n                            <td>没有学生</td>\r\n                        </tr>\r\n                    {% endfor %}\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n{% endblock content %}
+===================================================================
+--- students/templates/students/student_list.html	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ templates/students/student_list.html	(date 1574655549914)
+@@ -24,9 +24,9 @@
+                     </tr>
+                     </thead>
+                     <tbody>
+-                    {% for student in object_list %}
++                    {% for student in student_list %}
+                         <tr>
+-                            <td>{{ student.study_id }}</td>
++                            <td>{{ student.pk }}</td>
+                             <td>{{ student.student_name }}</td>
+                             <td>
+                                 <div class="container">
+@@ -34,7 +34,7 @@
+                                         {% for award in student.award_set.all %}
+                                             <li>
+                                                 <p>
+-                                                    <a href="{% url 'student:award-detail' award.id %}">{{ award.award_name }}</a>
++                                                    <a href="{% url 'student:award-detail' award.pk %}">{{ award.award_name }}</a>
+                                                 </p>
+                                             </li>
+                                         {% endfor %}
+@@ -42,7 +42,7 @@
+                                 </div>
+                             </td>
+                             <td>
+-                                <a href="{% url 'student:student-detail' student.id %}">更多···</a>
++                                <a href="{% url 'student:student-detail' student.pk %}">更多···</a>
+                             </td>
+                         </tr>
+                     {% empty %}
+Index: templates/userprofile/edit.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/userprofile/edit.html	(date 1574861331454)
++++ templates/userprofile/edit.html	(date 1574861331454)
+@@ -0,0 +1,40 @@
++{% extends "base.html" %} {% load staticfiles %}
++{% block title %} 用户信息 {% endblock title %}
++{% block content %}
++
++    <div class="container">
++        <div class="row">
++            <div class="col-12">
++                <br>
++                <div class="col-md-4">用户名:{{ user.username }}</div>
++                <br>
++                <form method="post" action="." class="form-group col-md-4">
++                    {% csrf_token %}
++                    <!-- 账号 -->
++                    <div class="form-group col-md-4">
++                        <label for="username">昵称</label>
++                        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
++                    </div>
++                    <!-- qq -->
++                    <div class="form-group col-md-4">
++                        <label for="student_qq">qq</label>
++                        <input type="text" class="form-control" id="student_qq" name="student_qq" value="{{ student.student_qq }}">
++                    </div>
++                    <!-- phone -->
++                    <div class="form-group col-md-4">
++                        <label for="student_tel">电话</label>
++                        <input type="text" class="form-control" id="student_tel" name="student_tel" value="{{ student.student_tel }}">
++                    </div>
++{#                    <!-- bio -->#}
++{#                    <div class="form-group col-md-4">#}
++{#                        <label for="bio">简介</label>#}
++{#                        <textarea type="text" class="form-control" id="bio" name="bio"#}
++{#                                  rows="12">{{ profile.bio }}</textarea>#}
++{#                    </div>#}
++                    <!-- 提交按钮 -->
++                    <button type="submit" class="btn btn-primary">提交</button>
++                </form>
++            </div>
++        </div>
++    </div>
++{% endblock content %}
+\ No newline at end of file
+Index: userprofile/templates/userprofile/register.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"base.html\" %}{% load staticfiles %}\r\n{% block title %}登录{% endblock %}\r\n{% block content %}\r\n    <div class=\"container\">\r\n        <div class=\"row\">\r\n            <div class=\"col-12\">\r\n                <br>\r\n                <form method=\"post\" action=\".\">\r\n                    {% csrf_token %}\r\n                    <div class=\"form-group col-md-4\">\r\n                        <label for=\"username\">昵称</label>\r\n                        <input type=\"text\" class=\"form-control\" id=\"username\" name=\"username\" required>\r\n                    </div>\r\n                    <div class=\"form-group col-md-4\">\r\n                        <label for=\"email\">Email</label>\r\n                        <input type=\"text\" class=\"form-control\" id=\"email\" name=\"email\">\r\n                    </div>\r\n                    <div class=\"form-group col-md-4\">\r\n                        <label for=\"password\">设置密码</label>\r\n                        <input type=\"password\" class=\"form-control\" id=\"password\" name=\"password\" required>\r\n                    </div>\r\n                    <div class=\"form-group col-md-4\">\r\n                        <label for=\"password2\">确认密码</label>\r\n                        <input type=\"password\" class=\"form-control\" id=\"password2\" name=\"password2\" required>\r\n                    </div>\r\n                    <button type=\"submit\" class=\"btn btn-primary\">提交</button>\r\n                </form>\r\n            </div>\r\n        </div>\r\n    </div>\r\n{% endblock %}
+===================================================================
+--- userprofile/templates/userprofile/register.html	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ templates/userprofile/register.html	(date 1574698160973)
+@@ -5,7 +5,7 @@
+         <div class="row">
+             <div class="col-12">
+                 <br>
+-                <form method="post" action=".">
++                <form method="post" action="">
+                     {% csrf_token %}
+                     <div class="form-group col-md-4">
+                         <label for="username">昵称</label>
+@@ -14,6 +14,10 @@
+                     <div class="form-group col-md-4">
+                         <label for="email">Email</label>
+                         <input type="text" class="form-control" id="email" name="email">
++                    </div>
++                    <div class="form-group col-md-4">
++                        <label for="student_id">学号</label>
++                        <input type="text" class="form-control" id="student_id" name="student_id">
+                     </div>
+                     <div class="form-group col-md-4">
+                         <label for="password">设置密码</label>
+@@ -22,6 +26,9 @@
+                     <div class="form-group col-md-4">
+                         <label for="password2">确认密码</label>
+                         <input type="password" class="form-control" id="password2" name="password2" required>
++                    </div>
++                    <div class="form-group col-md-4">
++                        <label for=""
+                     </div>
+                     <button type="submit" class="btn btn-primary">提交</button>
+                 </form>
+Index: userprofile/templates/userprofile/login.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"base.html\" %} {% load staticfiles %}\r\n{% block title %} 登录 {% endblock title %}\r\n{% block content %}\r\n    <div class=\"container\">\r\n        <div class=\"row\">\r\n            <div class=\"col-12\">\r\n                <br>\r\n                <form method=\"post\" action=\".\">\r\n                    {% csrf_token %}\r\n                    <!-- 账号 -->\r\n                    <div class=\"form-group\">\r\n                        <label for=\"username\">账号</label>\r\n                        <input type=\"text\" class=\"form-control\" id=\"username\" name=\"username\">\r\n                    </div>\r\n                    <!-- 密码 -->\r\n                    <div class=\"form-group\">\r\n                        <label for=\"password\">密码</label>\r\n                        <input type=\"password\" class=\"form-control\" id=\"password\" name=\"password\">\r\n                    </div>\r\n                    <br>\r\n                    <h5>还没有账号?</h5>\r\n                    <h5>点击<a href=\"{% url 'userprofile:user-register' %}\">注册账号</a>加入我们!</h5>\r\n                    <br>\r\n                    <!-- 提交按钮 -->\r\n                    <button type=\"submit\" class=\"btn btn-primary\">提交</button>\r\n                </form>\r\n                <br>\r\n                <h5>忘记密码了？</h5>\r\n                <h5>点击<a href='{% url \"password_reset_recover\" %}'>这里</a>重置密码</h5>\r\n            </div>\r\n        </div>\r\n    </div>\r\n{% endblock content %}
+===================================================================
+--- userprofile/templates/userprofile/login.html	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ templates/userprofile/login.html	(date 1574674691742)
+@@ -5,7 +5,7 @@
+         <div class="row">
+             <div class="col-12">
+                 <br>
+-                <form method="post" action=".">
++                <form method="post" action="">
+                     {% csrf_token %}
+                     <!-- 账号 -->
+                     <div class="form-group">
+Index: userprofile/views.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django.shortcuts import render, redirect\r\nfrom django.contrib.auth import authenticate, login, logout\r\nfrom django.http import HttpResponse\r\nfrom .form import UserLoginForm, UserRegisterForm\r\nfrom  django.contrib.auth.models import User\r\nfrom django.contrib.auth.decorators import login_required\r\n\r\n\r\ndef user_login(request):\r\n    if request.method == 'POST':\r\n        user_login_form = UserLoginForm(data=request.POST)\r\n        if user_login_form.is_valid():\r\n            data = user_login_form.cleaned_data\r\n            user = authenticate(username=data['username'], password=data['password'])\r\n            if user:\r\n                login(request, user)\r\n                return redirect(\"student:index\")\r\n\r\n            else:\r\n                return HttpResponse(\"账号或密码输入有误。请重新输入~\")\r\n        else:\r\n            return HttpResponse(\"账号或密码输入不合法\")\r\n\r\n    elif request.method == 'GET':\r\n        user_login_form = UserLoginForm()\r\n        context = {'form': user_login_form}\r\n        return render(request, 'userprofile/login.html', context)\r\n    else:\r\n        return HttpResponse(\"请使用GET或POST请求数据\")\r\n\r\n\r\ndef user_logout(request):\r\n    logout(request)\r\n    return redirect(\"student:index\")\r\n\r\n\r\ndef user_register(request):\r\n    if request.method == 'POST':\r\n        user_register_form = UserRegisterForm(data=request.POST)\r\n        if user_register_form.is_valid():\r\n            new_user = user_register_form.save(commit=False)\r\n            new_user.set_password(user_register_form.cleaned_data['password'])\r\n            new_user.save()\r\n            login(request, new_user)\r\n            return redirect(\"student:index\")\r\n        else:\r\n            return HttpResponse(\"注册表单输入有误,请重新输入~\")\r\n    elif request.method == 'GET':\r\n        user_register_form = UserRegisterForm()\r\n        context = {'form':user_register_form}\r\n        return render(request, 'userprofile/register.html',context)\r\n    else:\r\n        return HttpResponse(\"请使用GET或POST请求数据\")\r\n\r\n@login_required(login_url='/userprofile/login/')\r\ndef user_delete(request, id):\r\n    user = User.objects.get(id=id)\r\n    if request.user == user:\r\n        logout(request)\r\n        user.delete()\r\n        return  redirect(\"student:index\")\r\n    else:\r\n        return HttpResponse(\"你没有删除操作的权限。\")
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- userprofile/views.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ userprofile/views.py	(date 1574861655000)
+@@ -1,9 +1,10 @@
+ from django.shortcuts import render, redirect
+ from django.contrib.auth import authenticate, login, logout
+ from django.http import HttpResponse
+-from .form import UserLoginForm, UserRegisterForm
+-from  django.contrib.auth.models import User
++from .form import UserLoginForm, UserRegisterForm, StudentProfileForm
++from django.contrib.auth.models import User
+ from django.contrib.auth.decorators import login_required
++from students.models import Student
+ 
+ 
+ def user_login(request):
+@@ -38,26 +39,69 @@
+     if request.method == 'POST':
+         user_register_form = UserRegisterForm(data=request.POST)
+         if user_register_form.is_valid():
+-            new_user = user_register_form.save(commit=False)
+-            new_user.set_password(user_register_form.cleaned_data['password'])
+-            new_user.save()
+-            login(request, new_user)
++            # new_user = user_register_form.save(commit=False)
++            # new_user.set_password(user_register_form.cleaned_data['password'])
++            # new_user.save()
++            # login(request, new_user)
++            # user.student = Student.objects.get(student_id=register_cd['student_id'])
++            # user.username = register_cd['username']
++            # user.save()
++            register_cd = user_register_form.cleaned_data
++            user = User.objects.create(username=register_cd['username'],
++                                       password=register_cd['password'],
++                                       )
++            Student.objects.get(student_id=register_cd['student_id']).user = user
++            user.student.student_email = register_cd['email']
++            user.save()
++            user.student.save()
++            login(request, user)
+             return redirect("student:index")
+         else:
+             return HttpResponse("注册表单输入有误,请重新输入~")
+     elif request.method == 'GET':
+         user_register_form = UserRegisterForm()
+-        context = {'form':user_register_form}
+-        return render(request, 'userprofile/register.html',context)
++        context = {'form': user_register_form}
++        return render(request, 'userprofile/register.html', context)
+     else:
+         return HttpResponse("请使用GET或POST请求数据")
+ 
++
+ @login_required(login_url='/userprofile/login/')
+ def user_delete(request, id):
+     user = User.objects.get(id=id)
+     if request.user == user:
+         logout(request)
+         user.delete()
+-        return  redirect("student:index")
++        return redirect("student:index")
+     else:
+-        return HttpResponse("你没有删除操作的权限。")
+\ No newline at end of file
++        return HttpResponse("你没有删除操作的权限。")
++
++
++@login_required(login_url='/userprofile/login')
++def student_profile_edit(request, id):
++    user = User.objects.get(id=id)
++    student = user.student
++
++    if request.method == 'POST':
++        if request.user != user:
++            return HttpResponse("你没有权限修改用户信息。")
++        student_profile_form = StudentProfileForm(request.POST)
++        if student_profile_form.is_valid():
++            profile_cd = student_profile_form.cleaned_data
++            user.username = profile_cd['username']
++            user.save(update_fields=['username'])
++            student.student_qq = profile_cd['student_qq']
++            student.student_email = profile_cd['student_email']
++            student.student_tel = profile_cd['student_tel']
++            student.save()
++
++            return redirect("userprofile:student-profile-edit", id)
++        else:
++            return HttpResponse('注册表单输入有误，请重新输入！')
++
++    elif request.method == 'GET':
++        student_profile_form = StudentProfileForm()
++        context = {'student_profile_form': student_profile_form, 'student': student, 'user': user}
++        return render(request, 'userprofile/edit.html', context)
++    else:
++        return HttpResponse('请使用GET或者POST请求数据')
+Index: students/views.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django.shortcuts import render\r\nfrom django.http import HttpResponseRedirect, request, HttpResponse\r\nfrom django.shortcuts import get_object_or_404, render\r\nfrom django.views import generic\r\nfrom django.template import loader\r\n\r\nfrom .models import Student, Award, Awardship\r\n\r\n\r\ndef index(request):\r\n    context = {'student_list': Student, 'Award': Award}\r\n    return render(request, 'students/index.html', context)\r\n\r\n\r\nclass StudentListView(generic.ListView):\r\n    templates = 'students/student_list.html'\r\n    model = Student\r\n\r\n\r\ndef student_detail(request, student_id):\r\n    student = get_object_or_404(Student, id=student_id)\r\n    return render(request, 'students/student_detail.html', {'student': student})\r\n\r\n\r\nclass AwardListView(generic.ListView):\r\n    templates = 'students/award_list.html'\r\n    model = Award\r\n\r\n\r\ndef award_detail(request, award_id):\r\n    award = get_object_or_404(Award, id=award_id)\r\n    return render(request, 'students/award_detail.html', {'award': award})\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- students/views.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ students/views.py	(date 1574614824712)
+@@ -12,13 +12,18 @@
+     return render(request, 'students/index.html', context)
+ 
+ 
+-class StudentListView(generic.ListView):
+-    templates = 'students/student_list.html'
+-    model = Student
++# class StudentListView(generic.ListView):
++#     templates = 'students/student_list.html'
++#     model = Student
+ 
++def student_list(request):
++    student_list = Student.objects.all()
++    context = {'student_list': student_list}
++    return render(request, 'students/student_list.html', context)
+ 
+-def student_detail(request, student_id):
+-    student = get_object_or_404(Student, id=student_id)
++
++def student_detail(request, pk):
++    student = get_object_or_404(Student, student_id=pk)
+     return render(request, 'students/student_detail.html', {'student': student})
+ 
+ 
+@@ -27,6 +32,6 @@
+     model = Award
+ 
+ 
+-def award_detail(request, award_id):
+-    award = get_object_or_404(Award, id=award_id)
++def award_detail(request, pk):
++    award = get_object_or_404(Award, pk=pk)
+     return render(request, 'students/award_detail.html', {'award': award})
+Index: userprofile/urls.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django.urls import path\r\nfrom . import views\r\n\r\napp_name = 'userprofile'\r\n\r\nurlpatterns = [\r\n    path('login/', views.user_login, name='user-login'),\r\n    path('logout/', views.user_logout, name='user-logout'),\r\n    path('register/', views.user_register, name='user-register'),\r\n    path('delete/<int:id>/', views.user_delete, name='user-delete'),\r\n]\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- userprofile/urls.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ userprofile/urls.py	(date 1574759630442)
+@@ -8,4 +8,5 @@
+     path('logout/', views.user_logout, name='user-logout'),
+     path('register/', views.user_register, name='user-register'),
+     path('delete/<int:id>/', views.user_delete, name='user-delete'),
++    path('edit/<int:id>/', views.student_profile_edit, name='student-profile-edit'),
+ ]
+Index: students/urls.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django.urls import path\r\nfrom .views import StudentListView, AwardListView\r\nfrom . import views\r\n\r\napp_name = 'student'\r\nurlpatterns = [\r\n    path('', views.index, name='index'),\r\n    path('student_list/', StudentListView.as_view(), name='student-list'),\r\n    path('student_list/<int:student_id>/', views.student_detail, name='student-detail'),\r\n    path('award_list/', AwardListView.as_view(), name='award-list'),\r\n    path('award_list/<int:award_id>/', views.award_detail, name='award-detail'),\r\n]\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- students/urls.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ students/urls.py	(date 1574655515552)
+@@ -1,12 +1,12 @@
+ from django.urls import path
+-from .views import StudentListView, AwardListView
+ from . import views
+ 
+ app_name = 'student'
++
+ urlpatterns = [
+     path('', views.index, name='index'),
+-    path('student_list/', StudentListView.as_view(), name='student-list'),
+-    path('student_list/<int:student_id>/', views.student_detail, name='student-detail'),
+-    path('award_list/', AwardListView.as_view(), name='award-list'),
+-    path('award_list/<int:award_id>/', views.award_detail, name='award-detail'),
++    path('student_list/', views.student_list, name='student-list'),
++    path('student_list/<int:pk>/', views.student_detail, name='student-detail'),
++    path('award_list/', views.AwardListView.as_view(), name='award-list'),
++    path('award_list/<int:pk>/', views.award_detail, name='award-detail'),
+ ]
+Index: .idea/class_manage.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module type=\"PYTHON_MODULE\" version=\"4\">\r\n  <component name=\"FacetManager\">\r\n    <facet type=\"django\" name=\"Django\">\r\n      <configuration>\r\n        <option name=\"rootFolder\" value=\"$MODULE_DIR$\" />\r\n        <option name=\"settingsModule\" value=\"class_manage/settings.py\" />\r\n        <option name=\"manageScript\" value=\"$MODULE_DIR$/manage.py\" />\r\n        <option name=\"environment\" value=\"&lt;map/&gt;\" />\r\n        <option name=\"doNotUseTestRunner\" value=\"false\" />\r\n        <option name=\"trackFilePattern\" value=\"migrations\" />\r\n      </configuration>\r\n    </facet>\r\n  </component>\r\n  <component name=\"NewModuleRootManager\">\r\n    <content url=\"file://$MODULE_DIR$\">\r\n      <excludeFolder url=\"file://$MODULE_DIR$/venv\" />\r\n    </content>\r\n    <orderEntry type=\"inheritedJdk\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n  </component>\r\n  <component name=\"TemplatesService\">\r\n    <option name=\"TEMPLATE_CONFIGURATION\" value=\"Django\" />\r\n    <option name=\"TEMPLATE_FOLDERS\">\r\n      <list>\r\n        <option value=\"$MODULE_DIR$/../class_manage\\templates\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"TestRunnerService\">\r\n    <option name=\"PROJECT_TEST_RUNNER\" value=\"Unittests\" />\r\n  </component>\r\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/class_manage.iml	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ .idea/class_manage.iml	(date 1590596279582)
+@@ -16,7 +16,7 @@
+     <content url="file://$MODULE_DIR$">
+       <excludeFolder url="file://$MODULE_DIR$/venv" />
+     </content>
+-    <orderEntry type="inheritedJdk" />
++    <orderEntry type="jdk" jdkName="Python 3.7 (pycharm)" jdkType="Python SDK" />
+     <orderEntry type="sourceFolder" forTests="false" />
+   </component>
+   <component name="TemplatesService">
+Index: .idea/dataSources.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"DataSourceManagerImpl\" format=\"xml\" multifile-model=\"true\">\r\n    <data-source source=\"LOCAL\" name=\"db\" uuid=\"9f58f61c-650d-4e2d-b428-0685996c22b2\">\r\n      <driver-ref>sqlite.xerial</driver-ref>\r\n      <synchronize>true</synchronize>\r\n      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>\r\n      <jdbc-url>jdbc:sqlite:D:\\study\\class_manage\\db.sqlite3</jdbc-url>\r\n      <driver-properties>\r\n        <property name=\"enable_load_extension\" value=\"true\" />\r\n      </driver-properties>\r\n    </data-source>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/dataSources.xml	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ .idea/dataSources.xml	(date 1574601151245)
+@@ -10,5 +10,13 @@
+         <property name="enable_load_extension" value="true" />
+       </driver-properties>
+     </data-source>
++    <data-source source="LOCAL" name="Django default" uuid="1f0a9b87-f31f-4e9c-9a80-1354da1b670b">
++      <driver-ref>sqlite.xerial</driver-ref>
++      <synchronize>true</synchronize>
++      <imported>true</imported>
++      <remarks>$PROJECT_DIR$/class_manage/settings.py</remarks>
++      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
++      <jdbc-url>jdbc:sqlite:D:\study\class_manage\db.sqlite3</jdbc-url>
++    </data-source>
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"JavaScriptSettings\">\r\n    <option name=\"languageLevel\" value=\"ES6\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" project-jdk-name=\"Python 3.7 (class_manage)\" project-jdk-type=\"Python SDK\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/misc.xml	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ .idea/misc.xml	(date 1590596280132)
+@@ -3,5 +3,5 @@
+   <component name="JavaScriptSettings">
+     <option name="languageLevel" value="ES6" />
+   </component>
+-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.7 (class_manage)" project-jdk-type="Python SDK" />
++  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.7 (pycharm)" project-jdk-type="Python SDK" />
+ </project>
+\ No newline at end of file
+Index: userprofile/form.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django import forms\r\nfrom django.contrib.auth.models import User\r\n\r\n\r\nclass UserLoginForm(forms.Form):\r\n    username = forms.CharField()\r\n    password = forms.CharField()\r\n\r\nclass UserRegisterForm(forms.ModelForm):\r\n    password = forms.CharField()\r\n    password2 = forms.CharField()\r\n\r\n    class Meta:\r\n        model = User\r\n        fields = ('username', 'email')\r\n\r\n    def clean_password2(self):\r\n        data = self.cleaned_data\r\n        if data.get('password') == data.get('password2'):\r\n            return data.get('password')\r\n        else:\r\n            return forms.ValidationError(\"密码输入不一致，请重试。\")\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- userprofile/form.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ userprofile/form.py	(date 1574701641243)
+@@ -1,18 +1,21 @@
+ from django import forms
+ from django.contrib.auth.models import User
++from students.models import Student
+ 
+ 
+ class UserLoginForm(forms.Form):
+     username = forms.CharField()
+     password = forms.CharField()
+ 
++
+ class UserRegisterForm(forms.ModelForm):
+     password = forms.CharField()
+     password2 = forms.CharField()
++    student_id = forms.IntegerField()
+ 
+     class Meta:
+         model = User
+-        fields = ('username', 'email')
++        fields = ('username', 'email', 'student_id')
+ 
+     def clean_password2(self):
+         data = self.cleaned_data
+@@ -20,3 +23,11 @@
+             return data.get('password')
+         else:
+             return forms.ValidationError("密码输入不一致，请重试。")
++
++
++class StudentProfileForm(forms.ModelForm):
++    username = forms.CharField()
++
++    class Meta:
++        model = Student
++        fields = ('username', 'student_qq', 'student_email', 'student_tel')
+Index: students/admin.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django.contrib import admin\r\nfrom .models import Student, Award, Awardship\r\n\r\n\r\nclass StudentInline(admin.TabularInline):\r\n    model = Awardship\r\n    extra = 1\r\n\r\n\r\nclass StudentAdmin(admin.ModelAdmin):\r\n    fieldsets = [\r\n        ('学生信息', {'fields': ['student_name', 'study_id']}),\r\n        ('学生详情', {'fields': ['student_qq', 'student_email', 'student_tel', 'year_in_school'], 'classes': ['collapse']})\r\n    ]\r\n    inlines = [StudentInline]\r\n    list_display = ('student_name', 'study_id', 'year_in_school')\r\n    search_fields = ['student_name']\r\n\r\n\r\nclass AwardInline(admin.TabularInline):\r\n    model = Awardship\r\n    extra = 1\r\n\r\n\r\nclass AwardAdmin(admin.ModelAdmin):\r\n    fieldsets = [\r\n        ('活动或荣誉名称', {'fields': ['award_name', 'get_time']}),\r\n    ]\r\n    inlines = [AwardInline]\r\n    list_display = ('award_name', 'get_time')\r\n\r\n\r\nadmin.site.register(Student, StudentAdmin)\r\nadmin.site.register(Award, AwardAdmin)\r\nadmin.site.register(Awardship)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- students/admin.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ students/admin.py	(date 1574487764152)
+@@ -9,11 +9,11 @@
+ 
+ class StudentAdmin(admin.ModelAdmin):
+     fieldsets = [
+-        ('学生信息', {'fields': ['student_name', 'study_id']}),
++        ('学生信息', {'fields': ['student_name', 'student_id']}),
+         ('学生详情', {'fields': ['student_qq', 'student_email', 'student_tel', 'year_in_school'], 'classes': ['collapse']})
+     ]
+     inlines = [StudentInline]
+-    list_display = ('student_name', 'study_id', 'year_in_school')
++    list_display = ('student_name', 'student_id', 'year_in_school')
+     search_fields = ['student_name']
+ 
+ 
+Index: userprofile/models.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django.db import models\r\n\r\n# Create your models here.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- userprofile/models.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ userprofile/models.py	(date 1574480811474)
+@@ -1,3 +1,1 @@
+-from django.db import models
+-
+-# Create your models here.
++from django.contrib.auth.decorators import login_required
+Index: students/models.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from django.utils import timezone\r\nfrom django.db import models\r\nfrom django.db.models import TextField\r\n\r\n\r\nclass Student(models.Model):\r\n    student_name = models.CharField(max_length=10)\r\n    study_id = models.IntegerField(blank=True, null=True)\r\n\r\n    student_qq = models.CharField(max_length=10, blank=True, null=True)\r\n    student_email = models.EmailField(blank=True, null=True)\r\n    student_tel = models.CharField(max_length=15, blank=True, null=True)\r\n\r\n    FRESHMAN = 'FR'\r\n    SOPHOMORE = 'SO'\r\n    JUNIOR = 'JR'\r\n    SENIOR = 'SR'\r\n\r\n    YEAR_IN_SCHOOL_CHOICES = (\r\n        (FRESHMAN, 'Freshman'),\r\n        (SOPHOMORE, 'Sophomore'),\r\n        (JUNIOR, 'Junior'),\r\n        (SENIOR, 'Senior')\r\n\r\n    )\r\n    year_in_school = models.CharField(\r\n        max_length=2,\r\n        choices=YEAR_IN_SCHOOL_CHOICES,\r\n        default=FRESHMAN,\r\n    )\r\n\r\n    def __str__(self):\r\n        return self.student_name\r\n\r\n\r\nclass Award(models.Model):\r\n    award_name = models.CharField(max_length=30)\r\n    student = models.ManyToManyField(Student, through='Awardship')\r\n    get_time = models.DateTimeField()\r\n\r\n    def __str__(self):\r\n        return self.award_name\r\n\r\n\r\nclass Awardship(models.Model):\r\n    awardship_name = models.CharField(max_length=20)\r\n    student = models.ForeignKey(Student, on_delete=models.CASCADE)\r\n    award = models.ForeignKey(Award, on_delete=models.CASCADE)\r\n    awardship_detail = models.TextField(blank=True, null=True)\r\n\r\n    def __str__(self):\r\n        return self.awardship_name\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- students/models.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ students/models.py	(date 1574702925491)
+@@ -1,15 +1,16 @@
+ from django.utils import timezone
+ from django.db import models
+-from django.db.models import TextField
++from django.db.models import TextField, SET_NULL
++from django.contrib.auth.models import User
+ 
+ 
+ class Student(models.Model):
+-    student_name = models.CharField(max_length=10)
+-    study_id = models.IntegerField(blank=True, null=True)
+-
+-    student_qq = models.CharField(max_length=10, blank=True, null=True)
+-    student_email = models.EmailField(blank=True, null=True)
+-    student_tel = models.CharField(max_length=15, blank=True, null=True)
++    student_name = models.CharField(max_length=10, verbose_name='学生姓名')
++    student_id = models.IntegerField(primary_key=True, blank=False, null=False, verbose_name='学生学号', default=0)
++    student_qq = models.CharField(max_length=10, blank=True, null=True, verbose_name='学生qq')
++    student_email = models.EmailField(blank=True, null=True, verbose_name='学生邮箱')
++    student_tel = models.CharField(max_length=15, blank=True, null=True, verbose_name='学生电话')
++    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="student", null=True)
+ 
+     FRESHMAN = 'FR'
+     SOPHOMORE = 'SO'
+@@ -27,26 +28,42 @@
+         max_length=2,
+         choices=YEAR_IN_SCHOOL_CHOICES,
+         default=FRESHMAN,
++        verbose_name='学期'
+     )
+ 
+     def __str__(self):
+         return self.student_name
+ 
++    class Meta:
++        ordering = ['student_id']
++        verbose_name = '学生'
++        verbose_name_plural = '学生'
++
+ 
+ class Award(models.Model):
+-    award_name = models.CharField(max_length=30)
+-    student = models.ManyToManyField(Student, through='Awardship')
+-    get_time = models.DateTimeField()
++    award_name = models.CharField(max_length=30, verbose_name='赛事')
++    student = models.ManyToManyField(Student, through='Awardship', verbose_name='参与学生')
++    get_time = models.DateTimeField(verbose_name='比赛时间')
+ 
+     def __str__(self):
+         return self.award_name
+ 
++    class Meta:
++        ordering = ['get_time']
++        verbose_name = '比赛'
++        verbose_name_plural = '比赛'
++
+ 
+ class Awardship(models.Model):
+-    awardship_name = models.CharField(max_length=20)
+-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+-    award = models.ForeignKey(Award, on_delete=models.CASCADE)
+-    awardship_detail = models.TextField(blank=True, null=True)
++    awardship_name = models.CharField(max_length=20, verbose_name='获奖详情')
++    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='awardship_student',
++                                verbose_name='获奖学生')
++    award = models.ForeignKey(Award, on_delete=models.CASCADE, related_name='awardship_award', verbose_name='比赛')
++    awardship_detail = models.TextField(blank=True, null=True, verbose_name='获奖详情')
+ 
+     def __str__(self):
+         return self.awardship_name
++
++    class Meta:
++        verbose_name = '获奖奖项'
++        verbose_name_plural = '获奖奖项'
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/.gitignore	(date 1574601157579)
++++ .idea/.gitignore	(date 1574601157579)
+@@ -0,0 +1,6 @@
++# Default ignored files
++/workspace.xml
++
++# Datasource local storage ignored files
++/dataSources.local.xml
++/dataSources/
+\ No newline at end of file
+Index: class_manage/__init__.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- class_manage/__init__.py	(revision a99c8eae951cdb7d093036c12aa9fd64cc851925)
++++ class_manage/__init__.py	(date 1590596704970)
+@@ -1,0 +1,3 @@
++import pymysql
++
++pymysql.install_as_MySQLdb()
+Index: .idea/inspectionProfiles/Project_Default.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/inspectionProfiles/Project_Default.xml	(date 1574861174678)
++++ .idea/inspectionProfiles/Project_Default.xml	(date 1574861174678)
+@@ -0,0 +1,21 @@
++<component name="InspectionProjectProfileManager">
++  <profile version="1.0">
++    <option name="myName" value="Project Default" />
++    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
++      <option name="myValues">
++        <value>
++          <list size="7">
++            <item index="0" class="java.lang.String" itemvalue="nobr" />
++            <item index="1" class="java.lang.String" itemvalue="noembed" />
++            <item index="2" class="java.lang.String" itemvalue="comment" />
++            <item index="3" class="java.lang.String" itemvalue="noscript" />
++            <item index="4" class="java.lang.String" itemvalue="embed" />
++            <item index="5" class="java.lang.String" itemvalue="script" />
++            <item index="6" class="java.lang.String" itemvalue="用户名" />
++          </list>
++        </value>
++      </option>
++      <option name="myCustomValuesEnabled" value="true" />
++    </inspection_tool>
++  </profile>
++</component>
+\ No newline at end of file
+diff --git students/templates/students/index.html templates/students/index.html
+rename from students/templates/students/index.html
+rename to templates/students/index.html
+diff --git students/templates/students/student_detail.html templates/students/student_detail.html
+rename from students/templates/students/student_detail.html
+rename to templates/students/student_detail.html
