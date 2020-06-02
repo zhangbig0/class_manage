@@ -8,8 +8,8 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+        <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://www.layuicdn.com/layui-v2.5.6/css/layui.css" media="all">
 </head>
 
 <body>
@@ -18,11 +18,20 @@
 {% block content %}{% endblock content %}
 
 {% include 'footer.html' %}
-<script src="{% static 'jquery/jquery-3.3.1.js' %}"></script>
-<script src="{% static 'popper/popper-1.14.4.js' %}"></script>
-<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-<script src="{% static 'layui/layui.all.js' %}"></script>
-<script src="/static/layui/layui.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/popper.js/1.14.1/popper.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/layui/2.5.6/layui.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/layui/2.5.6/layui.all.js"></script>
+	<script>
+		;!function(){
+			  //无需再执行layui.use()方法加载模块，直接使用即可
+			  var form = layui.form
+			  ,layer = layui.layer;
+			  
+			  //…
+		}();
+	</script> 
 </body>
 
 </html>
