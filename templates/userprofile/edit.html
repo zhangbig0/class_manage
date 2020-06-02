@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% load staticfiles %}
+{% block title %} 用户信息 {% endblock title %}
+{% block content %}
+
+    <div class="layui-container">
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <form method="post" action="" class="layui-form col-md-8" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- 账号 -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" for="username">用户名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="username" class="layui-input layui-disabled" value="{{ user.username }}" readonly="readonly" disabled
+                                   id="username">
+                        </div>
+                    </div>
+                    {% if user.profile.avatar %}
+                        <div class="layui-col-md4">头像</div>
+                        <img src="{{ user.profile.avatar.url }}" style="max-width: 20%; border-radius: 15%;" class="layui-col-md4" alt="头像">
+                    {% else %}
+                        <h5>暂无头像</h5>
+                    {% endif %}
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" for="avatar">上传头像</label>
+                        <div class="layui-input-block">
+                            <input type="file" name="avatar" id="avatar" class="form-control-file">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" for="email">邮箱</label>
+                        <div class="layui-input-block">
+                            <input class="layui-input" type="email" name="email" id="email" lay-verify="email" value="{{ user.email }}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item" pane>
+                        <label class="layui-form-label " for="student">学生</label>
+                        <div class="layui-input-block">
+                            <select name="student" id="student">
+                                <option value="0">请选择</option>
+                                {% for student in students %}
+                                    {% if student.user_id == user.id %}
+                                        <option selected
+                                                value="{{ student.student_id }}">{{ student.student_name }}</option>
+                                    {% else %}
+                                        <option value="{{ student.student_id }}">{{ student.student_name }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" for="bio">个人简介</label>
+                        <div class="layui-input-block">
+                            <textarea type="text" class="layui-textarea" placeholder="请输入自我简介" id="bio" name="bio" rows="12">{{ user.profile.bio }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit="" lay-filter="formUserEdit">立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        //Demo
+        layui.use('form', function () {
+            var form = layui.form;
+
+            //监听提交
+            form.on('submit(formUserEdit)', function (data) {
+                layer.msg(JSON.stringify(data.field));
+                return false;
+            });
+        });
+    </script>
+{% endblock content %}

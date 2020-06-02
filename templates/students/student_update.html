@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    学生创建
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="col-md-12">
+            <br>
+            <form action="" method="post" class="layui-form" lay-filter="StudentUpdateForm">
+                {% csrf_token %}
+                <div class="layui-form-item">
+                    <label class="layui-form-label" for="student_id">学号</label>
+                    <div class="layui-input-block">
+                        <input type="text" class="layui-input" id="student_id" name="student_id" required value="{{ student.student_id }}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="student_name" class="layui-form-label">姓名</label>
+                    <div class="layui-input-block">
+                        <input type="text" class="layui-input" id="student_name" name="student_name" required value="{{ student.student_name }}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="student_qq" class="layui-form-label">qq号</label>
+                    <div class="layui-input-block">
+                        <input type="text" class="layui-input" id="student_qq" name="student_qq" value="{{ student.student_qq }}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" for="student_email">邮箱</label>
+                    <div class="layui-input-block">
+                        <input type="email" class="layui-input" id="student_email" name="student_email" value="{{ student.student_email }}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" for="student_tel">电话</label>
+                    <div class="layui-input-block">
+                        <input type="text" class="layui-input" id="student_tel" name="student_tel" value="{{ student.student_tel }}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formStudentCreate">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

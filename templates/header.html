@@ -1,41 +1,51 @@
-<!-- 定义导航栏 -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
+<div class="layui-header header layui-bg-black">
+    <div class="layui-main">
 
-        <!-- 导航栏商标 -->
-        <a class="navbar-brand" href="{% url 'student:index' %}">班级管理网站</a>
 
-        <!-- 导航入口 -->
-        <div>
-            <ul class="navbar-nav">
-                <!-- 条目 -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'student:student-list' %}">学生管理</a>
+        <ul class="layui-nav" lay-filter="">
+            <!-- 条目 -->
+            <li class="layui-nav-item">
+                <a class="nav-link" href="{% url 'student:student-list' %}">学生管理</a>
+            </li>
+            <li class="layui-nav-item">
+                <a class="nav-link" href="{% url 'student:award-list' %}">荣誉管理</a>
+            </li>
+            {% if user.is_authenticated %}
+                <li class="layui-nav-item">
+                    <a href="javascript:">{{ user.username }}</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="{% url 'userprofile:student-profile-edit' user.id %}">个人信息</a></dd>
+                        <dd><a href="{% url 'userprofile:user-logout' %}">退出登录</a></dd>
+                        <dd><a href="#" onclick="confirm_delete()">删除用户</a></dd>
+                    </dl>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'student:award-list' %}">荣誉管理</a>
+            {% else %}
+                <li class="layui-nav-item">
+                    <a href="{% url 'userprofile:user-login' %}">登录</a>
                 </li>
 
-                {% if user.is_authenticated %}
-                    <!-- 如果用户已经登录，则显示用户名下拉框 -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ user.username }}
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{% url 'userprofile:user-logout' %}">退出登录</a>
-                            <a class="dropdown-item" href="{% url 'userprofile:user-delete' user.id %}">删除用户</a>
-                        </div>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'userprofile:user-login' %}">登录</a>
-                    </li>
-                {% endif %}
-
-            </ul>
-        </div>
-
+            {% endif %}
+        </ul>
     </div>
-</nav>
+</div>
+<script>
+    layui.use('element', function () {
+        var element = layui.element;
+    });
+
+    function confirm_delete() {
+        layui.use('layer', function () {
+            var layer = layui.layer;
+        });
+        {% if user.is_authenticated %}
+            layer.open({
+                title: "确认删除",
+                content: "确认删除用户吗？",
+
+                yes: function (index, layero) {
+                    location.href = '{% url 'userprofile:user-delete' user.id %}'
+                },
+            })
+        {% endif %}
+    }
+</script>
